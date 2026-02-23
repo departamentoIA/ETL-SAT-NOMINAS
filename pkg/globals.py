@@ -7,42 +7,36 @@ from typing import Dict, List, Optional, Any
 ROOT_DATA_PATH = Path(
     r"\\sia\AECF\DGATIC\LOTA\Bases de Datos\SAT")
 
-BATCH_SIZE = 10_000     # It should be lower than 50_000
+BATCH_SIZE = 100     # It should be lower than 100_000
 
 TABLES_TO_PROCESS = [
-    'GERG_AECF_1891_Anexo1A-QA',
+    'GERG_AECF_1891_Anexo3C',
 ]
 
 # Columns 'Int32' type for all tables
-col_int32 = ['FormaPago', 'EmisorRegimenFiscal',
+col_int32 = ['NumDiasPagados', 'ReceptorTipoContrato', 'ReceptorTipoRegimen',
+             'ReceptorPeriodicidadPago', 'ReceptorBanco'
              ]
 
 # Columns 'DATE' type for all tables
-col_date = ['FechaEmision', 'FechaCertificacion', 'FechaCancelacion']
+col_date = ['FechaPago', 'FechaPago2', 'FechaFinalPago', 'ReceptorFechaInicioRelLaboral',
+            'FechaCancelacion'
+            ]
 
 # String Columns to be converted to string, to be clean and to be converted to uppercase
-col_str = ['UUID', 'Moneda', 'TipoDeComprobante', 'EmisorRFC', 'ReceptorRFC', 'Serie',
-           'Folio', 'CondicionesDePago', 'MetodoPago', 'ReceptorNombre', 'EmisorNombre',
+col_str = ['UUID', 'EmisorRFC', 'ReceptorRFC', 'TipoNomina', 'EmisorCurp',
+           'EmisorEntidadSNCFOrigenRecurso', 'EmisorEntidadSNCFMontoRecursoPropio',
+           'ReceptorDepartamento', 'ReceptorPuesto',
            ]
 
 # Columns 'Float64' type for all tables
-col_float = ['Descuento', 'SubTotal', 'Total', 'TrasladosIVA', 'TrasladosIEPS',
-             'TotalImpuestosTrasladados', 'RetenidosIVA', 'RetenidosISR',
-             'TotalImpuestosRetenidos', 'TipoCambio',
+col_float = ['TotalPercepciones', 'TotalDeducciones', 'TotalOtrosPagos',
+             'PercepcionesTotalGravado', 'PercepcionesTotalExento',
+             'TotalOtrasDeducciones', 'NominaTotalImpuestosRetenidos'
              ]
 
 # Columns to be encoded manually
-col_encode = ['EmisorRFC', 'EmisorNombre', 'ReceptorRFC', 'ReceptorNombre']
-
-# Catalogs
-path_cat = r"\\sia\AECF\DGATIC\LOTA\Bases de Datos\CATALOGOS\CatalogoAPF_2026.xlsx"
-catalogoAPF = pl.read_excel(path_cat)
-path_TIC = r"\\sia\AECF\DGATIC\LOTA\Bases de Datos\CATALOGOS\Proveedores_TIC_2026.xlsx"
-proveeedoresTIC = pl.read_excel(path_TIC)
-path_sancionado = r"\\sia\AECF\DGATIC\LOTA\Bases de Datos\CATALOGOS\Proveedores_Contratistas_Sancionados.xlsx"
-sancionado = pl.read_excel(path_sancionado)
-path_lista69 = r"\\sia\AECF\DGATIC\LOTA\Bases de Datos\CATALOGOS\Listado_Completo_69-B.xlsx"
-lista69 = pl.read_excel(path_lista69)
+col_encode = ['ReceptorDepartamento', 'ReceptorPuesto']
 
 mapeo = {
     'Ã‘': 'Ñ', 'Ã±': 'Ñ', 'ÃƑ': 'Ñ',

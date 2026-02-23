@@ -10,7 +10,7 @@ def cast_columns(df: pl.DataFrame, columns: Iterable[str], dtype: pl.DataType
     Only apply the cast if the column exists."""
     return df.with_columns(
         [
-            pl.col(col).cast(dtype)
+            pl.col(col).cast(pl.Float64).cast(dtype)
             for col in columns
             if col in df.columns
         ]
@@ -28,6 +28,17 @@ def parse_datetime_columns(df: pl.DataFrame, columns: Iterable[str],
               .alias(col)
             for col in columns
             if col in df.columns and df.schema[col] == pl.Utf8
+        ]
+    )
+
+
+def to_cleaned_str(df: pl.DataFrame, columns: Iterable[str]) -> pl.DataFrame:
+    """Clean data and convert to uppercase."""
+    return df.with_columns(
+        [
+            pl.col(col).str.strip_chars().str.to_uppercase().alias(col)
+            for col in columns
+            if col in df.columns
         ]
     )
 
@@ -71,62 +82,11 @@ def manual_encoding(df: pl.DataFrame, cols: Iterable[str], mapeo: Mapping[str, s
     return df.with_columns(exprs)
 
 
-def anexo1a(df: pl.DataFrame) -> pl.DataFrame:
-    """Add columns to table according to catalogs."""
-    return df.with_columns([
-        # Catalogo APF
-        pl.col("ReceptorRFC")
-        .is_in(catalogoAPF["RFC_APF"])
-        .alias("ReceptorEnCatalogoAPF"),
-        pl.col("EmisorRFC")
-        .is_in(catalogoAPF["RFC_APF"])
-        .alias("EmisorEnCatalogoAPF"),
-
-        # Proveedores TIC
-        pl.col("ReceptorRFC")
-        .is_in(proveeedoresTIC["RFC_Proveedor"])
-        .alias("ReceptorEnCatalogoTIC"),
-        pl.col("EmisorRFC")
-        .is_in(proveeedoresTIC["RFC_Proveedor"])
-        .alias("EmisorEnCatalogoTIC"),
-
-        # Sancionado
-        pl.col("ReceptorNombre")
-        .is_in(sancionado["Proveedor y Contratista"])
-        .alias("ReceptorSancionado"),
-        pl.col("EmisorNombre")
-        .is_in(sancionado["Proveedor y Contratista"])
-        .alias("EmisorSancionado"),
-
-        # Lista 69B
-        pl.col("ReceptorRFC")
-        .is_in(lista69["RFC_Lista69B"])
-        .alias("ReceptorEnLista69"),
-        pl.col("EmisorRFC")
-        .is_in(lista69["RFC_Lista69B"])
-        .alias("EmisorEnLista69"),
-
-        # Vigente
-        pl.col("FechaCancelacion")
-        .is_null()
-        .alias("Vigente")
-    ])
-
-
-def add_cols(table_name: str, df: pl.DataFrame) -> pl.DataFrame:
-    """Add columns if applicable."""
-    if table_name == 'GERG_AECF_1891_Anexo1A-QA':
-        return anexo1a(df)
-    else:
-        return df
-
-
-def transform(table_name: str, df: pl.DataFrame) -> pl.DataFrame:
+def transform(df: pl.DataFrame) -> pl.DataFrame:
     """Apply cast and formating to the DataFrames."""
     df = cast_columns(df, col_int32, pl.Int32)
     df = cast_columns(df, col_float, pl.Float64)
     df = parse_datetime_columns(df, col_date)
     df = to_cleaned_str(df, col_str)
     df = manual_encoding(df, col_encode, mapeo)
-    df = add_cols(table_name, df)
     return df
