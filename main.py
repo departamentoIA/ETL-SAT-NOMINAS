@@ -37,12 +37,12 @@ def etl_for_batch(table_name: str, ROOT_DATA_PATH: str) -> None:
             if batch_count == 1:
                 print(f"Dimensiones del DataFrame: {df_trans.shape}")
                 print(df_trans.schema)
-                df_trans.write_excel(f'{table_name}_clean.xlsx')
+                # df_trans.write_excel(f'{table_name}_clean.xlsx')
             # 3. Load to SQL Server (L)
-            # load_table(df_trans, f'{table_name}', batch_count)
+            load_table(df_trans, f'{table_name}', batch_count)
             fin = time.perf_counter()
             print(f"Tiempo procesando lote: {fin - inicio:.4f} s")
-            if batch_count > 2:
+            if batch_count >= 1:
                 return
 
     print(f"\nTabla: '{table_name}' procesada con éxito.")
@@ -52,7 +52,7 @@ def main():
     """E-T-L process."""
     for table_name in TABLES_TO_PROCESS:
         print("\n" + "=" * 25)
-        print(f"📊 Procesando Tabla: {table_name}")
+        print(f"📊 Procesando Tabla: '{table_name}'")
         print("=" * 25)
         try:
             # get_df_sample(table_name, ROOT_DATA_PATH)

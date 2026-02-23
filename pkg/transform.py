@@ -1,7 +1,7 @@
 # transform.py
 """This file calls 'globals.py' and 'config.py'."""
 from pkg.globals import *
-from typing import Iterable, Mapping
+from typing import Iterable
 
 
 def cast_columns(df: pl.DataFrame, columns: Iterable[str], dtype: pl.DataType
@@ -43,50 +43,10 @@ def to_cleaned_str(df: pl.DataFrame, columns: Iterable[str]) -> pl.DataFrame:
     )
 
 
-def to_cleaned_str(df: pl.DataFrame, columns: Iterable[str]) -> pl.DataFrame:
-    """Clean data and convert to uppercase."""
-    return df.with_columns(
-        [
-            pl.col(col).str.strip_chars().str.to_uppercase().alias(col)
-            for col in columns
-            if col in df.columns
-        ]
-    )
-
-
-def _build_expr(col_name: str, mapeo: Mapping[str, str]) -> pl.Expr:
-    """Build clean expression"""
-    expr = pl.col(col_name).cast(pl.Utf8).str.to_uppercase()
-
-    for roto, real in mapeo.items():
-        expr = expr.str.replace_all(roto, real)
-
-    # Additional cleaning
-    expr = (
-        expr
-        .str.replace_all(r'[?\\"*,:;.]', " ")   # ? \" * -> espacio
-        .str.replace_all(r"\s+", " ")       # colapsar espacios
-        .str.strip_chars()                  # quitar espacios al inicio/fin
-    )
-
-    return expr.alias(col_name)
-
-
-def manual_encoding(df: pl.DataFrame, cols: Iterable[str], mapeo: Mapping[str, str]) -> pl.DataFrame:
-    """Apply manual encoding to the correspondig columns."""
-    cols_existentes = [c for c in cols if c in df.columns]
-    if not cols_existentes:
-        return df
-
-    exprs = [_build_expr(c, mapeo) for c in cols_existentes]
-    return df.with_columns(exprs)
-
-
 def transform(df: pl.DataFrame) -> pl.DataFrame:
     """Apply cast and formating to the DataFrames."""
     df = cast_columns(df, col_int32, pl.Int32)
     df = cast_columns(df, col_float, pl.Float64)
     df = parse_datetime_columns(df, col_date)
     df = to_cleaned_str(df, col_str)
-    df = manual_encoding(df, col_encode, mapeo)
     return df
