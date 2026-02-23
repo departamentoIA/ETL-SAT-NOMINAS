@@ -1,0 +1,10 @@
+openpyxl
+xlsxwriter
+numpy
+polars
+sqlalchemy
+pyodbc
+pyarrow>=8.0.0
+dotenv
+pandas
+fastexcel
