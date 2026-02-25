@@ -62,9 +62,9 @@ def load_table(df: pl.DataFrame, table_name: str, batch_count: int) -> None:
     # 'fast_executemany=True' is the secret to speed in SQL Server
     engine = create_engine(get_connection_string(), fast_executemany=True)
     table_name = table_name.replace("-", "_")
-    print(f"Subiendo tabla '{table_name}' a SQL Server...")
     if batch_count == 1:
         create_table_from_df(engine, table_name, df)
+        print(f"Subiendo tabla '{table_name}' a SQL Server...")
     try:
         df.write_database(
             table_name=table_name,
