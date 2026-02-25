@@ -45,7 +45,7 @@ def get_df_sample(table_name: str, root_path: Path) -> None:
         file_path,
         separator='|',
         has_header=True,
-        encoding="utf8",      # Avoid errors caused by unusual characters
+        encoding="utf8-lossy",      # Avoid errors caused by unusual characters
         ignore_errors=True,         # Useful if there are damaged rows
         low_memory=True,            # Reduce RAM usage
         n_rows=100

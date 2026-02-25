@@ -20,6 +20,7 @@ LONG_TEXT_COLS = ['UUID']
 # Columns 'Int32' type for all tables
 col_int32 = ['NumDiasPagados', 'ReceptorTipoContrato', 'ReceptorTipoRegimen',
              'ReceptorPeriodicidadPago', 'ReceptorBanco', 'TipoPercepcion',
+             'DeduccionTipoDeduccion'
              ]
 
 # Columns 'DATE' type for all tables
@@ -29,18 +30,19 @@ col_date = ['ReceptorFechaInicioRelLaboral', 'FechaCancelacion']
 col_str = ['UUID', 'EmisorRFC', 'ReceptorRFC', 'TipoNomina', 'EmisorCurp',
            'EmisorEntidadSNCFOrigenRecurso', 'EmisorEntidadSNCFMontoRecursoPropio',
            'ReceptorDepartamento', 'ReceptorPuesto', 'PercepcionClave',
-           'PercepcionConcepto'
+           'PercepcionConcepto', 'DeduccionClave', 'DeduccionConcepto'
            ]
 
 # Columns 'Float64' type for all tables
 col_float = ['TotalPercepciones', 'TotalDeducciones', 'TotalOtrosPagos',
              'PercepcionesTotalGravado', 'PercepcionesTotalExento',
              'TotalOtrasDeducciones', 'NominaTotalImpuestosRetenidos',
-             'PercepcionImporteGravado', 'PercepcionImporteExento'
+             'PercepcionImporteGravado', 'PercepcionImporteExento',
+             'DeduccionesImporte'
              ]
 
 # Columns to be encoded manually
-col_encode = ['ReceptorPuesto', 'PercepcionConcepto']
+col_encode = ['ReceptorPuesto', 'PercepcionConcepto', 'DeduccionConcepto']
 
 mapeo = {
     r"([AEIOUaeiou])\ufffd([AEIOUaeiou])": r"${1}Ñ${2}",
@@ -49,5 +51,7 @@ mapeo = {
     r"DID\ufffdCTICO": "DIDÁCTICO", r"ESPEC\ufffdFICA": "ESPECÍFICA",
     r"MAESTR\ufffdA": "MAESTRÍA", r"B\ufffdSICA": "BÁSICA",
     r"EST\ufffdMULO": "ESTÍMULO", r"M\ufffdLTIPLE": "MÚLTIPLE",
-    r"ACAD\ufffdMICO": "ACADÉMICO", r"M\ufffdLTIPLE": "MÚLTIPLE",
+    r"ACAD\ufffdMICO": "ACADÉMICO", r"N\ufffdMINA": "NÓMINA",
+    r"CR\ufffdDITO": "CRÉDITO", r"PR\ufffdSTAMO": "PRÉSTAMO",
+    r"AC\ufffdRCATE": "ACÉRCATE", r"CESANT\ufffdA": "CESANTÍA"
 }
