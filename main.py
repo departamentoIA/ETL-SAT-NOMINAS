@@ -42,7 +42,7 @@ def etl_for_batch(table_name: str, ROOT_DATA_PATH: str) -> None:
             load_table(df_trans, f'{table_name}', batch_count)
             fin = time.perf_counter()
             print(f"Tiempo procesando lote: {fin - inicio:.4f} s")
-            if batch_count >= 1:
+            if batch_count >= 3:
                 return
 
     print(f"\nTabla: '{table_name}' procesada con éxito.")
