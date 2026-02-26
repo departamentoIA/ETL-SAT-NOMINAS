@@ -7,10 +7,11 @@ from typing import Iterable, Mapping
 def cast_columns(df: pl.DataFrame, columns: Iterable[str], dtype: pl.DataType
                  ) -> pl.DataFrame:
     """Cast the specified columns to the specified type.
-    Only apply the cast if the column exists."""
+    Apply the cast only if the column exists."""
     return df.with_columns(
         [
-            pl.col(col).cast(pl.Float64).cast(dtype)
+            pl.col(col).cast(pl.Float64, strict=False)
+            .cast(dtype)
             for col in columns
             if col in df.columns
         ]
@@ -43,10 +44,21 @@ def to_cleaned_str(df: pl.DataFrame, columns: Iterable[str]) -> pl.DataFrame:
     )
 
 
+def truncate_str_to_255(df: pl.DataFrame, columns: Iterable[str]) -> pl.DataFrame:
+    """Truncate string to 255 character if applicable."""
+    cols_set = set(df.columns)
+    long_text_set = set(LONG_TEXT_COLS)
+    candidate_cols = [
+        c for c in columns if c in cols_set and c not in long_text_set]
+    if not candidate_cols:
+        return df
+
+    return df.with_columns([pl.col(c).str.slice(0, 255) for c in candidate_cols])
+
+
 def _build_expr(col_name: str, mapeo: Mapping[str, str]) -> pl.Expr:
     """Build clean expression"""
     expr = pl.col(col_name).cast(pl.Utf8).str.to_uppercase()
-
     for roto, real in mapeo.items():
         expr = expr.str.replace_all(roto, real)
 
@@ -57,7 +69,6 @@ def _build_expr(col_name: str, mapeo: Mapping[str, str]) -> pl.Expr:
         .str.replace_all(r"\s+", " ")       # colapsar espacios
         .str.strip_chars()                  # quitar espacios al inicio/fin
     )
-
     return expr.alias(col_name)
 
 
@@ -77,5 +88,6 @@ def transform(df: pl.DataFrame) -> pl.DataFrame:
     df = cast_columns(df, col_float, pl.Float64)
     df = parse_datetime_columns(df, col_date)
     df = to_cleaned_str(df, col_str)
+    df = truncate_str_to_255(df, col_str_trucated)
     df = manual_encoding(df, col_encode, mapeo)
     return df

@@ -37,21 +37,32 @@ def etl_for_batch(table_name: str, ROOT_DATA_PATH: str) -> None:
             if batch_count == 1:
                 print(f"Dimensiones del DataFrame: {df_trans.shape}")
                 print(df_trans.schema)
-                df_trans.write_excel(f'{table_name}_clean.xlsx')
+                # df_trans.write_excel(f'{table_name}_clean.xlsx')
+                logging.info(f"Dimensiones del DataFrame: {df_trans.shape}")
+                logging.info(df_trans.schema)
             # 3. Load to SQL Server (L)
             load_table(df_trans, f'{table_name}', batch_count)
             step += 1
             if step == 1:
                 print(f"\nProcesando lote {batch_count}...")
                 inicio = time.perf_counter()
+                logging.info(f"\nProcesando lote {batch_count}...")
             if step == n_lotes:
                 fin = time.perf_counter()
                 print(
-                    f"Tiempo procesando {n_lotes} lotes: {fin - inicio:.4f} s")
+                    f"Tiempo procesando {n_lotes*BATCH_SIZE} filas: {fin - inicio:.4f} s")
                 step = 0
-
-    print(f"222Total de lotes: {batch_count}")
-    print(f"\nTabla: '{table_name}' procesada con éxito.")
+                logging.info(
+                    f"Tiempo procesando {n_lotes*BATCH_SIZE} filas: {fin - inicio:.4f} s")
+            """
+            if batch_count > 100:
+                print(f"Sólo {batch_count*BATCH_SIZE} registros procesados")
+                return
+            """
+    print(
+        f"\nTabla: '{table_name}' con {batch_count*BATCH_SIZE} registros fue procesada con éxito.")
+    logging.info(
+        f"\nTabla: '{table_name}' con {batch_count*BATCH_SIZE} registros fue procesada con éxito.")
 
 
 def main():
@@ -59,6 +70,7 @@ def main():
     for table_name in TABLES_TO_PROCESS:
         print("\n" + "=" * 25)
         print(f"📊 Procesando Tabla: '{table_name}'")
+        logging.info(f"* Procesando Tabla: '{table_name}'")
         print("=" * 25)
         try:
             # get_df_sample(table_name, ROOT_DATA_PATH)
