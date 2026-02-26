@@ -24,14 +24,15 @@ def etl_for_batch(table_name: str, ROOT_DATA_PATH: str) -> None:
     reader = extract_from_batch(table_name, ROOT_DATA_PATH)
     batch_count = 0
     step = 0
+    n_rows = 0
     while True:
         batches = reader.next_batches(1)    # Extract next batch
         if not batches:
-            print(f"11Total de lotes: {batch_count}")
             break                           # End of file
 
         for df_batch in batches:
             batch_count += 1
+            n_rows += df_batch.shape[0]
             # 2. Transformation (T)
             df_trans = transform(df_batch)
             if batch_count == 1:
@@ -46,23 +47,22 @@ def etl_for_batch(table_name: str, ROOT_DATA_PATH: str) -> None:
             if step == 1:
                 print(f"\nProcesando lote {batch_count}...")
                 inicio = time.perf_counter()
-                logging.info(f"\nProcesando lote {batch_count}...")
             if step == n_lotes:
                 fin = time.perf_counter()
                 print(
                     f"Tiempo procesando {n_lotes*BATCH_SIZE} filas: {fin - inicio:.4f} s")
                 step = 0
                 logging.info(
-                    f"Tiempo procesando {n_lotes*BATCH_SIZE} filas: {fin - inicio:.4f} s")
+                    f"Filas subidas: {n_rows}")
             """
-            if batch_count > 100:
-                print(f"Sólo {batch_count*BATCH_SIZE} registros procesados")
+            if batch_count > 2000000:
+                print(f"Sólo {n_rows} registros procesados")
                 return
             """
     print(
-        f"\nTabla: '{table_name}' con {batch_count*BATCH_SIZE} registros fue procesada con éxito.")
+        f"\nTabla '{table_name}' con {n_rows} registros fue procesada con éxito.")
     logging.info(
-        f"\nTabla: '{table_name}' con {batch_count*BATCH_SIZE} registros fue procesada con éxito.")
+        f"\nTabla '{table_name}' con {n_rows} registros fue procesada con éxito.")
 
 
 def main():
