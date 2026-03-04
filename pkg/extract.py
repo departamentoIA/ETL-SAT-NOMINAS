@@ -1,6 +1,7 @@
 # extract.py
 """This file calls 'globals.py'."""
 from pkg.globals import *
+import codecs
 
 
 def get_file_paths(table_name: str, root_path: Path) -> Optional[Path]:
@@ -14,22 +15,52 @@ def get_file_paths(table_name: str, root_path: Path) -> Optional[Path]:
     return None
 
 
-def extract_from_batch(table_name: str, root_path: Path) -> pl.DataFrame:
+def normalize_to_utf8_streaming(
+    src: Path,
+    src_encoding: str = "windows-1252",
+    chunk_size: int = 8 * 1024 * 1024,  # 8 MB
+) -> Path:
+    """Normalize all file to utf8 (by chunks)"""
+    dst = src.with_suffix(src.suffix + ".utf8")
+    if dst.exists():
+        return dst
+
+    decoder = codecs.getincrementaldecoder(src_encoding)(errors="replace")
+    with src.open("rb") as f_in, dst.open("w", encoding="utf-8", errors="replace", newline="") as f_out:
+        while True:
+            chunk = f_in.read(chunk_size)
+            if not chunk:
+                break
+            text = decoder.decode(chunk)
+            f_out.write(text)
+
+        # Vaciar el decoder (por si quedó estado interno)
+        tail = decoder.decode(b"", final=True)
+        if tail:
+            f_out.write(tail)
+
+    print("Archivo convertido a utf8 correctamente!")
+    return dst
+
+
+def extract_from_batch(table_name: str, root_path: Path):
     """Read files and construct DataFrames."""
     file_path = get_file_paths(table_name, root_path)
     if not file_path:
         raise FileNotFoundError(
             f"No se encontró el archivo para '{table_name}'.")
 
+    utf8_path = normalize_to_utf8_streaming(Path(file_path), "windows-1252")
     df = pl.read_csv_batched(
-        file_path,
+        utf8_path,
         separator='|',
         has_header=True,
-        encoding="utf8-lossy",
+        encoding="utf8",
         ignore_errors=True,         # Useful if there are damaged rows
         truncate_ragged_lines=True,
         infer_schema_length=0,
-        batch_size=BATCH_SIZE
+        batch_size=BATCH_SIZE,
+        quote_char=None,   # <- clave: desactiva parsing de comillas
     )
     return df
 

@@ -2,6 +2,7 @@
 """This file calls 'globals.py' and 'config.py'."""
 from pkg.globals import *
 from typing import Iterable, Mapping
+import os
 
 
 def cast_columns(df: pl.DataFrame, columns: Iterable[str], dtype: pl.DataType
@@ -91,3 +92,21 @@ def transform(df: pl.DataFrame) -> pl.DataFrame:
     df = truncate_str_to_255(df, col_str_trucated)
     df = manual_encoding(df, col_encode, mapeo)
     return df
+
+
+def save_batch_to_csv(df: pl.DataFrame, table_name: str, batch_count: int) -> None:
+    """Save the df batch to csv file."""
+    output_path = f"{table_name}_full.csv"
+    if batch_count == 1:
+        if os.path.exists(output_path):
+            os.remove(output_path)
+        first_write = True
+    else:
+        first_write = False
+
+    mode = "wb" if first_write else "ab"
+    with open(output_path, mode) as f:
+        df.write_csv(
+            file=f,
+            include_header=first_write
+        )

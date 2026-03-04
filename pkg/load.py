@@ -74,3 +74,4 @@ def load_table(df: pl.DataFrame, table_name: str, batch_count: int) -> None:
 
     except Exception as e:
         print(f"❌ Error: {e}")
+        logging.info(f"Error: {e}")

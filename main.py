@@ -41,8 +41,9 @@ def etl_for_batch(table_name: str, ROOT_DATA_PATH: str) -> None:
                 # df_trans.write_excel(f'{table_name}_clean.xlsx')
                 logging.info(f"Dimensiones del DataFrame: {df_trans.shape}")
                 logging.info(df_trans.schema)
-            # 3. Load to SQL Server (L)
-            load_table(df_trans, f'{table_name}', batch_count)
+            # 3. Load to SQL Server (L) or save to file
+            # load_table(df_trans, f'{table_name}', batch_count)
+            save_batch_to_csv(df_trans, f'{table_name}', batch_count)
             step += 1
             if step == 1:
                 print(f"\nProcesando lote {batch_count}...")
@@ -55,7 +56,7 @@ def etl_for_batch(table_name: str, ROOT_DATA_PATH: str) -> None:
                 logging.info(
                     f"Filas subidas: {n_rows}")
             """
-            if batch_count > 2000000:
+            if batch_count > 2000:
                 print(f"Sólo {n_rows} registros procesados")
                 return
             """
