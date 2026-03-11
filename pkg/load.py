@@ -1,8 +1,6 @@
 # load.py
 """This file calls 'globals.py' and 'config.py'."""
 from pkg.globals import *
-from sqlalchemy import create_engine
-from pkg.config import get_connection_string
 from sqlalchemy import text
 
 
@@ -57,10 +55,8 @@ def create_table_from_df(engine, table_name: str, df: pl.DataFrame,
         conn.execute(text(create_sql))
 
 
-def load_table(df: pl.DataFrame, table_name: str, batch_count: int) -> None:
+def load_table(engine, df: pl.DataFrame, table_name: str, batch_count: int) -> None:
     """Load the DataFrame to SQL Server by using SQLAlchemy."""
-    # 'fast_executemany=True' is the secret to speed in SQL Server
-    engine = create_engine(get_connection_string(), fast_executemany=True)
     table_name = table_name.replace("-", "_")
     if batch_count == 1:
         create_table_from_df(engine, table_name, df)

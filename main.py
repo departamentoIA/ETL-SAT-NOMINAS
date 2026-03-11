@@ -16,6 +16,15 @@ from pkg.extract import *
 from pkg.transform import *
 from pkg.load import *
 import time
+from sqlalchemy import create_engine
+from pkg.config import get_connection_string
+
+engine = create_engine(
+    # 'fast_executemany=True' is the secret to speed in SQL Server
+    get_connection_string(),
+    fast_executemany=True,
+    pool_pre_ping=True
+)
 
 
 def etl_for_batch(table_name: str, ROOT_DATA_PATH: str) -> None:
@@ -42,8 +51,8 @@ def etl_for_batch(table_name: str, ROOT_DATA_PATH: str) -> None:
                 logging.info(f"Dimensiones del DataFrame: {df_trans.shape}")
                 logging.info(df_trans.schema)
             # 3. Load to SQL Server (L) or save to file
-            # load_table(df_trans, f'{table_name}', batch_count)
-            save_batch_to_csv(df_trans, f'{table_name}', batch_count)
+            load_table(engine, df_trans, f'{table_name}', batch_count)
+            # save_batch_to_csv(df_trans, f'{table_name}', batch_count)
             step += 1
             if step == 1:
                 print(f"\nProcesando lote {batch_count}...")

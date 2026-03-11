@@ -26,7 +26,7 @@ def normalize_to_utf8_streaming(
         return dst
 
     decoder = codecs.getincrementaldecoder(src_encoding)(errors="replace")
-    with src.open("rb") as f_in, dst.open("w", encoding="utf-8", errors="replace", newline="") as f_out:
+    with src.open("rb") as f_in, dst.open("w", encoding="utf8", errors="replace", newline="") as f_out:
         while True:
             chunk = f_in.read(chunk_size)
             if not chunk:
@@ -79,6 +79,7 @@ def get_df_sample(table_name: str, root_path: Path) -> None:
         encoding="utf8-lossy",      # Avoid errors caused by unusual characters
         ignore_errors=True,         # Useful if there are damaged rows
         low_memory=True,            # Reduce RAM usage
+        truncate_ragged_lines=True,
         n_rows=100
     )
 

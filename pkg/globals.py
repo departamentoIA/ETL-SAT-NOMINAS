@@ -6,17 +6,20 @@ from typing import Dict, List, Optional, Any
 import logging
 
 ROOT_DATA_PATH = Path(
-    r"D:\caarteaga\Documents\TABLAS")
+    r"\\sia\AECF\DGATIC\LOTA\Bases de Datos\SAT")
 
-BATCH_SIZE = 100                     # It should be lower than 100
-n_lotes = 50_000
+BATCH_SIZE = 1000
+n_lotes = 20000
 
 TABLES_TO_PROCESS = [
-    'GERG_AECF_1891_Anexo4D', 'GERG_AECF_1891_Anexo6F'
-    # 'GERG_AECF_1891_Anexo3C', 'GERG_AECF_1891_Anexo4D',
-    # 'GERG_AECF_1891_Anexo5E', 'GERG_AECF_1891_Anexo6F',
-    # Subidas:
-    # 'GERG_AECF_1891_Anexo3C','GERG_AECF_1891_Anexo7G'
+    'GERG_AECF_1891_Anexo6F',
+    # 'AECF_0129_Anexo1_TablaD',
+    'AECF_0129_Anexo1_TablaE',
+    'AECF_0129_Anexo1_TablaF',
+    'AECF_0129_Anexo1_TablaG'
+    # 'AECF_0129_Anexo1_TablaF', 'AECF_0129_Anexo1_TablaG'
+    # 'GERG_AECF_1891_Anexo6F',
+
 ]
 
 # Columns with very long text

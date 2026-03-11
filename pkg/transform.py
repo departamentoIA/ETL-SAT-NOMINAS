@@ -12,7 +12,7 @@ def cast_columns(df: pl.DataFrame, columns: Iterable[str], dtype: pl.DataType
     return df.with_columns(
         [
             pl.col(col).cast(pl.Float64, strict=False)
-            .cast(dtype)
+            .cast(dtype, strict=False)
             for col in columns
             if col in df.columns
         ]
