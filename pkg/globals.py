@@ -8,18 +8,12 @@ import logging
 ROOT_DATA_PATH = Path(
     r"\\sia\AECF\DGATIC\LOTA\Bases de Datos\SAT")
 
-BATCH_SIZE = 1000
-n_lotes = 20000
+BATCH_SIZE = 10_000
+n_lotes = 5000
 
 TABLES_TO_PROCESS = [
-    'GERG_AECF_1891_Anexo6F',
-    # 'AECF_0129_Anexo1_TablaD',
-    'AECF_0129_Anexo1_TablaE',
-    'AECF_0129_Anexo1_TablaF',
-    'AECF_0129_Anexo1_TablaG'
-    # 'AECF_0129_Anexo1_TablaF', 'AECF_0129_Anexo1_TablaG'
-    # 'GERG_AECF_1891_Anexo6F',
-
+    'AECF_0101_Anexo5',
+    'AECF_0101_Anexo6', 'AECF_0101_Anexo7'
 ]
 
 # Columns with very long text

@@ -7,7 +7,7 @@ from sqlalchemy import text
 def map_polars_to_sql(colname: str, dtype: pl.DataType):
     """Get the SQL type of every column."""
     if dtype == pl.Utf8 and colname in LONG_TEXT_COLS:
-        return "NVARCHAR(MAX)"
+        return "NVARCHAR(255)"
     if colname in ('EmisorRFC', 'ReceptorRFC', 'ReceptorBanco'):
         return "NVARCHAR(50)"
 

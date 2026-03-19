@@ -15,14 +15,33 @@ def get_file_paths(table_name: str, root_path: Path) -> Optional[Path]:
     return None
 
 
+def detect_encoding(path: Path) -> str:
+    """Detect encoding automatically."""
+    with path.open("rb") as f:
+        start = f.read(4)
+
+    if start.startswith(b"\xff\xfe"):
+        return "utf-16"
+    if start.startswith(b"\xfe\xff"):
+        return "utf-16"
+    if start.startswith(b"\xef\xbb\xbf"):
+        return "utf-8-sig"
+
+    return "windows-1252"
+
+
 def normalize_to_utf8_streaming(
     src: Path,
-    src_encoding: str = "windows-1252",
+    src_encoding: Optional[str] = None,
     chunk_size: int = 8 * 1024 * 1024,  # 8 MB
 ) -> Path:
     """Normalize all file to utf8 (by chunks)"""
+    print("Convirtiendo archivo a utf8...")
+    if src_encoding is None:
+        src_encoding = detect_encoding(src)
     dst = src.with_suffix(src.suffix + ".utf8")
     if dst.exists():
+        print("Archivo utf8 encontrado.")
         return dst
 
     decoder = codecs.getincrementaldecoder(src_encoding)(errors="replace")
@@ -39,7 +58,7 @@ def normalize_to_utf8_streaming(
         if tail:
             f_out.write(tail)
 
-    print("Archivo convertido a utf8 correctamente!")
+    print(f"Archivo convertido a utf8 correctamente usando {src_encoding}!")
     return dst
 
 
@@ -50,7 +69,7 @@ def extract_from_batch(table_name: str, root_path: Path):
         raise FileNotFoundError(
             f"No se encontró el archivo para '{table_name}'.")
 
-    utf8_path = normalize_to_utf8_streaming(Path(file_path), "windows-1252")
+    utf8_path = normalize_to_utf8_streaming(Path(file_path))
     df = pl.read_csv_batched(
         utf8_path,
         separator='|',
@@ -76,7 +95,7 @@ def get_df_sample(table_name: str, root_path: Path) -> None:
         file_path,
         separator='|',
         has_header=True,
-        encoding="utf8-lossy",      # Avoid errors caused by unusual characters
+        encoding="utf8",      # Avoid errors caused by unusual characters
         ignore_errors=True,         # Useful if there are damaged rows
         low_memory=True,            # Reduce RAM usage
         truncate_ragged_lines=True,

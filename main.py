@@ -65,7 +65,7 @@ def etl_for_batch(table_name: str, ROOT_DATA_PATH: str) -> None:
                 logging.info(
                     f"Filas subidas: {n_rows}")
             """
-            if batch_count > 2000:
+            if batch_count > 200:
                 print(f"Sólo {n_rows} registros procesados")
                 return
             """
