@@ -46,4 +46,9 @@ DB_NAME=SAT
 DB_USER=caarteaga
 DB_PASSWORD=pa$$word
 ```
-4. Run "main.py".
+4. Run "main_resume_functions.py"
+```
+python main_resume_functions.py
+python main_resume_functions.py --resume-row 250001
+python main_resume_functions.py --resume-table GERG_AECF_1891_Anexo6F --resume-row 250001.
+```

@@ -27,6 +27,7 @@ import time
 from pathlib import Path
 from sqlalchemy import create_engine, text
 
+
 ENGINE = create_engine(
     get_connection_string(),
     fast_executemany=True,
@@ -41,7 +42,8 @@ TECHNICAL_ROW_COL = "_etl_source_row"
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="ETL con pausa/reanudacion por fila")
+    parser = argparse.ArgumentParser(
+        description="ETL con pausa/reanudacion por fila")
     parser.add_argument(
         "--resume-row",
         type=int,
@@ -138,7 +140,8 @@ def map_polars_to_sql(colname: str, dtype: pl.DataType):
 def add_source_row_column(df: pl.DataFrame, start_row: int) -> pl.DataFrame:
     row_count = df.height
     return df.with_columns(
-        pl.Series(TECHNICAL_ROW_COL, list(range(start_row, start_row + row_count)), dtype=pl.Int64)
+        pl.Series(TECHNICAL_ROW_COL, list(
+            range(start_row, start_row + row_count)), dtype=pl.Int64)
     )
 
 
@@ -172,7 +175,8 @@ def table_exists(engine, table_name: str) -> bool:
 
 
 def delete_rows_from_row(engine, table_name: str, start_row: int):
-    sql = text(f"DELETE FROM [dbo].[{table_name}] WHERE [{TECHNICAL_ROW_COL}] >= :start_row")
+    sql = text(
+        f"DELETE FROM [dbo].[{table_name}] WHERE [{TECHNICAL_ROW_COL}] >= :start_row")
     with engine.begin() as conn:
         conn.execute(sql, {"start_row": start_row})
 
@@ -217,7 +221,8 @@ def trim_batch_for_resume(df_batch: pl.DataFrame, batch_start_row: int, resume_r
 def prepare_target_for_resume(engine, table_name: str, resume_row: int):
     sql_table_name = normalize_table_name(table_name)
     if table_exists(engine, sql_table_name) and resume_row > 1:
-        print(f"Limpiando filas desde la fila {resume_row} en '{sql_table_name}' para evitar duplicados...")
+        print(
+            f"Limpiando filas desde la fila {resume_row} en '{sql_table_name}' para evitar duplicados...")
         delete_rows_from_row(engine, sql_table_name, resume_row)
 
 
@@ -255,7 +260,8 @@ def process_table(table_name: str, resume_row_arg: int | None) -> str:
                 completed_batches = batch_count
                 continue
 
-            df_work = trim_batch_for_resume(df_batch, batch_start_row, resume_row)
+            df_work = trim_batch_for_resume(
+                df_batch, batch_start_row, resume_row)
             if df_work.height == 0:
                 completed_batches = batch_count
                 continue
@@ -270,14 +276,16 @@ def process_table(table_name: str, resume_row_arg: int | None) -> str:
 
             if not first_insert_done:
                 recreate_table = resume_row == 1
-                load_table_idempotent(ENGINE, df_trans, table_name, recreate_table=recreate_table)
+                load_table_idempotent(
+                    ENGINE, df_trans, table_name, recreate_table=recreate_table)
                 first_insert_done = True
                 print(f"Dimensiones del DataFrame: {df_trans.shape}")
                 print(df_trans.schema)
                 logging.info(f"Dimensiones del DataFrame: {df_trans.shape}")
                 logging.info(df_trans.schema)
             else:
-                load_table_idempotent(ENGINE, df_trans, table_name, recreate_table=False)
+                load_table_idempotent(
+                    ENGINE, df_trans, table_name, recreate_table=False)
 
             completed_batches = batch_count
             total_rows_loaded_this_run += df_trans.height
@@ -293,11 +301,13 @@ def process_table(table_name: str, resume_row_arg: int | None) -> str:
 
             step += 1
             if step == 1:
-                print(f"\nProcesando lote {batch_count} (filas {effective_start_row}-{next_row - 1})...")
+                print(
+                    f"\n  Procesando lote {batch_count} (filas {effective_start_row}-{next_row - 1})...")
                 inicio = time.perf_counter()
             if step == n_lotes:
                 fin = time.perf_counter()
-                print(f"Tiempo procesando {n_lotes * BATCH_SIZE} filas: {fin - inicio:.4f} s")
+                print(
+                    f"Tiempo procesando {n_lotes * BATCH_SIZE} filas: {fin - inicio:.4f} s")
                 step = 0
                 logging.info(f"Filas subidas: {total_rows_effective}")
 
@@ -311,16 +321,21 @@ def process_table(table_name: str, resume_row_arg: int | None) -> str:
                 )
                 message = (
                     f"Pausa solicitada. '{table_name}' quedo en la fila {next_row} "
-                    f"despues del lote {batch_count}."
+                    f"despues del lote {batch_count}. Para reanudar la carga, borre el archivo pause.flag"
                 )
                 print(f"\n{message}")
                 logging.info(message)
                 return "paused"
 
-    final_next_row = max(resume_row, checkpoint.get("next_row", 1)) + total_rows_loaded_this_run
-    final_rows = final_next_row - 1 if total_rows_loaded_this_run > 0 else int(checkpoint.get("rows_loaded", 0))
-    print(f"\nTabla '{table_name}' procesada con exito. Filas cargadas hasta: {final_rows}.")
-    logging.info(f"Tabla '{table_name}' procesada con exito. Filas cargadas hasta: {final_rows}.")
+    final_next_row = max(resume_row, checkpoint.get(
+        "next_row", 1)) + total_rows_loaded_this_run
+    final_rows = final_next_row - \
+        1 if total_rows_loaded_this_run > 0 else int(
+            checkpoint.get("rows_loaded", 0))
+    print(
+        f"\nTabla '{table_name}' procesada con exito. Filas cargadas hasta: {final_rows}.")
+    logging.info(
+        f"Tabla '{table_name}' procesada con exito. Filas cargadas hasta: {final_rows}.")
     clear_checkpoint(table_name)
     return "completed"
 
@@ -338,7 +353,8 @@ def main():
         raise ValueError("--resume-row debe ser mayor o igual a 1")
 
     if pause_requested():
-        print("Se encontro 'pause.flag'. El proceso no iniciara hasta eliminar ese archivo.")
+        print(
+            "Se encontro 'pause.flag'. El proceso no iniciara hasta eliminar ese archivo.")
         return
 
     tables_to_process = get_tables_to_process(args.resume_table)
@@ -357,7 +373,8 @@ def main():
             checkpoint = load_checkpoint(table_name)
             save_checkpoint(
                 table_name=table_name,
-                last_completed_batch=int(checkpoint.get("last_completed_batch", 0)),
+                last_completed_batch=int(
+                    checkpoint.get("last_completed_batch", 0)),
                 rows_loaded=int(checkpoint.get("rows_loaded", 0)),
                 next_row=int(checkpoint.get("next_row", 1)),
                 status="failed",
