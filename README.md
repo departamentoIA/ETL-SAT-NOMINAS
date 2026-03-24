@@ -48,9 +48,7 @@ DB_PASSWORD=pa$$word
 ```
 4. Run "main_resume_functions.py":
 ```
-python main_resume_functions.py ^
-  --root-data-path "\\sia\AECF\DGATIC\LOTA\Bases de Datos\SAT" ^
-  --tables AECF_0101_Anexo5 AECF_0101_Anexo6
+python main_resume_functions.py --root-data-path "\\sia\AECF\DGATIC\LOTA\Bases de Datos\SAT" --tables AECF_0101_Anexo5 AECF_0101_Anexo6
 ```
 To run specific table:
 ```
@@ -64,7 +62,7 @@ python main_resume_functions.py ^
 ## 📦 Make it executable
 1. Run:
 ```
-pyinstaller --onefile --name etl_resume main_resume_functions.py
+pyinstaller --onefile --name etl_resume --hidden-import=polars main_resume_functions.py
 ```
 2. 'etl_resume.exe' will be created, then paste the '.env' file in the same path. Finally, run the executable:
 ```

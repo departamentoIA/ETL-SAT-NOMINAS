@@ -18,7 +18,7 @@ Uso:
 
 from pkg.extract import extract_from_batch
 from pkg.transform import transform
-from pkg.globals import BATCH_SIZE, n_lotes, TABLES_TO_PROCESS, LONG_TEXT_COLS, logging
+from pkg.globals import BATCH_SIZE, n_lotes, LONG_TEXT_COLS, logging
 from pkg.config import get_connection_string
 import polars as pl
 import argparse
