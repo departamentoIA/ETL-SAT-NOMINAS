@@ -5,16 +5,15 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 import logging
 
-ROOT_DATA_PATH = Path(
-    r"\\sia\AECF\DGATIC\LOTA\Bases de Datos\SAT")
+# ROOT_DATA_PATH = Path(
+#    r"\\sia\AECF\DGATIC\LOTA\Bases de Datos\SAT")
+BASE_DIR = Path(__file__).resolve().parent
+output_dir = BASE_DIR / "convertidas_a_utf8"
 
 BATCH_SIZE = 10_000
 n_lotes = 5000
 
-TABLES_TO_PROCESS = [
-    'AECF_0101_Anexo5',
-    'AECF_0101_Anexo6', 'AECF_0101_Anexo7'
-]
+# TABLES_TO_PROCESS = ['AECF_0101_Anexo5', 'AECF_0101_Anexo6']
 
 # Columns with very long text
 LONG_TEXT_COLS = ['UUID']

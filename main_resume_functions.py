@@ -18,7 +18,7 @@ Uso:
 
 from pkg.extract import extract_from_batch
 from pkg.transform import transform
-from pkg.globals import ROOT_DATA_PATH, BATCH_SIZE, n_lotes, TABLES_TO_PROCESS, LONG_TEXT_COLS, logging
+from pkg.globals import BATCH_SIZE, n_lotes, TABLES_TO_PROCESS, LONG_TEXT_COLS, logging
 from pkg.config import get_connection_string
 import polars as pl
 import argparse
@@ -49,6 +49,18 @@ def parse_args():
         type=int,
         default=None,
         help="Fila de datos desde la que se desea reanudar (1 = primera fila de datos)",
+    )
+    parser.add_argument(
+        "--root-data-path",
+        type=Path,
+        required=True,
+        help="Ruta raíz donde se encuentran las tablas fuente (.csv/.txt)",
+    )
+    parser.add_argument(
+        "--tables",
+        nargs="+",
+        required=True,
+        help="Lista de tablas a procesar, separadas por espacio",
     )
     parser.add_argument(
         "--resume-table",
@@ -226,8 +238,8 @@ def prepare_target_for_resume(engine, table_name: str, resume_row: int):
         delete_rows_from_row(engine, sql_table_name, resume_row)
 
 
-def process_table(table_name: str, resume_row_arg: int | None) -> str:
-    reader = extract_from_batch(table_name, ROOT_DATA_PATH)
+def process_table(table_name: str, root_data_path: Path, resume_row_arg: int | None) -> str:
+    reader = extract_from_batch(table_name, root_data_path)
     checkpoint = load_checkpoint(table_name)
     resume_row = get_resume_row(table_name, resume_row_arg)
     current_row_pointer = 1
@@ -340,10 +352,10 @@ def process_table(table_name: str, resume_row_arg: int | None) -> str:
     return "completed"
 
 
-def get_tables_to_process(resume_table: str | None):
+def get_tables_to_process(tables: list[str], resume_table: str | None):
     if resume_table:
         return [resume_table]
-    return TABLES_TO_PROCESS
+    return tables
 
 
 def main():
@@ -352,12 +364,16 @@ def main():
     if args.resume_row is not None and args.resume_row < 1:
         raise ValueError("--resume-row debe ser mayor o igual a 1")
 
+    if not args.root_data_path.exists():
+        raise FileNotFoundError(f"No existe la ruta: {args.root_data_path}")
+
     if pause_requested():
         print(
             "Se encontro 'pause.flag'. El proceso no iniciara hasta eliminar ese archivo.")
         return
 
-    tables_to_process = get_tables_to_process(args.resume_table)
+    root_data_path = args.root_data_path
+    tables_to_process = get_tables_to_process(args.tables, args.resume_table)
 
     for table_name in tables_to_process:
         print("\n" + "=" * 25)
@@ -365,7 +381,7 @@ def main():
         logging.info(f"* Procesando tabla: '{table_name}'")
         print("=" * 25)
         try:
-            status = process_table(table_name, args.resume_row)
+            status = process_table(table_name, root_data_path, args.resume_row)
             if status == "paused":
                 print("\n--- PIPELINE PAUSADO ---")
                 return

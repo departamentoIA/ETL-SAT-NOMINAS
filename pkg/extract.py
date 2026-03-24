@@ -34,17 +34,27 @@ def normalize_to_utf8_streaming(
     src: Path,
     src_encoding: Optional[str] = None,
     chunk_size: int = 8 * 1024 * 1024,  # 8 MB
+    output_dir: Optional[Path] = None,  # <-- nuevo parámetro
 ) -> Path:
-    """Normalize all file to utf8 (by chunks)"""
+    """Normalize file to utf-8 (by chunks) and optionally write to a different directory"""
     print("Convirtiendo archivo a utf8...")
+
     if src_encoding is None:
         src_encoding = detect_encoding(src)
-    dst = src.with_suffix(src.suffix + ".utf8")
+
+    # Determinar ruta destino
+    if output_dir is not None:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        dst = output_dir / (src.name + ".utf8")
+    else:
+        dst = src.with_suffix(src.suffix + ".utf8")
+
     if dst.exists():
         print("Archivo utf8 encontrado.")
         return dst
 
     decoder = codecs.getincrementaldecoder(src_encoding)(errors="replace")
+
     with src.open("rb") as f_in, dst.open("w", encoding="utf8", errors="replace", newline="") as f_out:
         while True:
             chunk = f_in.read(chunk_size)
@@ -69,7 +79,8 @@ def extract_from_batch(table_name: str, root_path: Path):
         raise FileNotFoundError(
             f"No se encontró el archivo para '{table_name}'.")
 
-    utf8_path = normalize_to_utf8_streaming(Path(file_path))
+    utf8_path = normalize_to_utf8_streaming(
+        Path(file_path), output_dir=output_dir)
     df = pl.read_csv_batched(
         utf8_path,
         separator='|',

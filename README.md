@@ -46,9 +46,27 @@ DB_NAME=SAT
 DB_USER=caarteaga
 DB_PASSWORD=pa$$word
 ```
-4. Run "main_resume_functions.py"
+4. Run "main_resume_functions.py":
 ```
-python main_resume_functions.py
-python main_resume_functions.py --resume-row 250001
-python main_resume_functions.py --resume-table GERG_AECF_1891_Anexo6F --resume-row 250001.
+python main_resume_functions.py ^
+  --root-data-path "\\sia\AECF\DGATIC\LOTA\Bases de Datos\SAT" ^
+  --tables AECF_0101_Anexo5 AECF_0101_Anexo6
+```
+To run specific table:
+```
+python main_resume_functions.py ^
+  --root-data-path "\\sia\AECF\DGATIC\LOTA\Bases de Datos\SAT" ^
+  --tables AECF_0101_Anexo5 AECF_0101_Anexo6 ^
+  --resume-table AECF_0101_Anexo6 ^
+  --resume-row 250001
+```
+
+## 📦 Make it executable
+1. Run:
+```
+pyinstaller --onefile --name etl_resume main_resume_functions.py
+```
+2. 'etl_resume.exe' will be created, then paste the '.env' file in the same path. Finally, run the executable:
+```
+etl_resume.exe --root-data-path "D:\fuentes\SAT" --tables AECF_0101_Anexo5 AECF_0101_Anexo6
 ```
