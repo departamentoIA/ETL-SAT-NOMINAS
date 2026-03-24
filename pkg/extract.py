@@ -38,10 +38,8 @@ def normalize_to_utf8_streaming(
 ) -> Path:
     """Normalize file to utf-8 (by chunks) and optionally write to a different directory"""
     print("Convirtiendo archivo a utf8...")
-
     if src_encoding is None:
         src_encoding = detect_encoding(src)
-
     # Determinar ruta destino
     if output_dir is not None:
         output_dir.mkdir(parents=True, exist_ok=True)

@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-ETL con pausa/reanudacion por fila, sin clases y solo con funciones.
-
 Caracteristicas:
 - Reanudacion automatica con checkpoints JSON.
 - Reanudacion manual desde una fila con --resume-row.
