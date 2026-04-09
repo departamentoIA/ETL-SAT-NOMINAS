@@ -209,7 +209,8 @@ __marimo__/
 # Excel file
 *.xlsx
 
-# Txt file
+# More files
 *.txt
 *.csv
 *.csv.utf8
+*.json
