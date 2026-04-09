@@ -1,5 +1,7 @@
 # ETL-SAT-NOMINAS
 Full ETL process with Polars and SQL Server. All DataFrames (tables) are obtain from csv files.
+All secret data connection should be contained in '.env' file (not provided).
+Source file path is specified in the input argument '--root-data-path' and the table names are specified in the argument '--tables'.
 
 ## 🌎 Repository Structure
 ```
