@@ -30,6 +30,7 @@ ENGINE = create_engine(
     get_connection_string(),
     fast_executemany=True,
     pool_pre_ping=True,
+    connect_args={"timeout": 300}  # For queries
 )
 
 BASE_DIR = Path(__file__).resolve().parent

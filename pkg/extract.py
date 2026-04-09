@@ -77,6 +77,9 @@ def extract_from_batch(table_name: str, root_path: Path):
         raise FileNotFoundError(
             f"No se encontró el archivo para '{table_name}'.")
 
+    output_dir = root_path
+    # output_dir = BASE_DIR / "convertidas_a_utf8"
+
     utf8_path = normalize_to_utf8_streaming(
         Path(file_path), output_dir=output_dir)
     df = pl.read_csv_batched(

@@ -19,8 +19,15 @@ ETL-SAT-NOMINAS/
 
 
 ## ✨ Details
+**main_resume_functions.py:** This script calls 'extract.py' to obtain the DataFrames corresponding to the tables, then 'transform.py' script is called to clean data, to convert the columns into the correct format and to load to SQL Server. The corresponding table is created by using SQL commands before loading data. It has the following features:
+- Automatic resumption with JSON checkpoints ('checkpoints' folder is created to save the JSON file with the corresponding information to restart the process for each table).
+- Manual resumption from a row using `--resume-row`.
+- Graceful pause by creating the `pause.flag` file.
+- Idempotent row loading by adding the `_etl_source_row` technical column.
 
-**main.py:** This script calls 'extract.py' to obtain the DataFrames corresponding to the tables, then 'transform.py' script is called to clean data, to convert the columns into the correct format and to load to SQL Server. The corresponding table is created by using SQL commands before loading data.
+Before resuming, deletes from that row forward to avoid duplicates.
+
+**main.py:** Performences the ETL process of 'main_resume_functions.py', but restart is not possible. It is possible to save the processed data into a CSV file with the 'save_batch_to_csv' function.
 
 ## 🚀 How to run locally
 1. Clone this repository:
@@ -50,21 +57,11 @@ DB_PASSWORD=pa$$word
 ```
 python main_resume_functions.py --root-data-path "\\sia\AECF\DGATIC\LOTA\Bases de Datos\SAT" --tables AECF_0101_Anexo5 AECF_0101_Anexo6
 ```
-To run specific table:
+To run specific tables and conditions:
 ```
 python main_resume_functions.py ^
   --root-data-path "\\sia\AECF\DGATIC\LOTA\Bases de Datos\SAT" ^
   --tables AECF_0101_Anexo5 AECF_0101_Anexo6 ^
   --resume-table AECF_0101_Anexo6 ^
   --resume-row 250001
-```
-
-## 📦 Make it executable
-1. Run:
-```
-pyinstaller --onefile --name etl_resume --hidden-import=polars main_resume_functions.py
-```
-2. 'etl_resume.exe' will be created, then paste the '.env' file in the same path. Finally, run the executable:
-```
-etl_resume.exe --root-data-path "D:\fuentes\SAT" --tables AECF_0101_Anexo5 AECF_0101_Anexo6
 ```

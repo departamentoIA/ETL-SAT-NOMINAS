@@ -51,8 +51,8 @@ def etl_for_batch(table_name: str, ROOT_DATA_PATH: str) -> None:
                 logging.info(f"Dimensiones del DataFrame: {df_trans.shape}")
                 logging.info(df_trans.schema)
             # 3. Load to SQL Server (L) or save to file
-            load_table(engine, df_trans, f'{table_name}', batch_count)
-            # save_batch_to_csv(df_trans, f'{table_name}', batch_count)
+            # load_table(engine, df_trans, f'{table_name}', batch_count)
+            save_batch_to_csv(df_trans, f'{table_name}', batch_count)
             step += 1
             if step == 1:
                 print(f"\nProcesando lote {batch_count}...")
