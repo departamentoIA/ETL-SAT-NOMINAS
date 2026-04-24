@@ -17,7 +17,7 @@ def get_connection_string():
     params = urllib.parse.quote_plus(
         f'DRIVER={{ODBC Driver 17 for SQL Server}};'
         f'SERVER={SERVER};DATABASE={DATABASE};UID={USER};PWD={PASSWORD};'
-        f'Connection Timeout=300;'
+        f'Connection Timeout=3000;'
         f'Timeout=300;'  # Initial connection
     )
     return f"mssql+pyodbc:///?odbc_connect={params}"
