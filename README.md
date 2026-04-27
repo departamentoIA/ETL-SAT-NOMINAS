@@ -78,6 +78,7 @@ Fig. 2.
 Fig. 3.
 
 In the folder 'checkpoints' is the corresponding JSON file, which contains the information necessary to restart the table loading, as shown in Fig. 4.
+
 ![alt text](Images/r4.png)
 Fig. 4.
 
