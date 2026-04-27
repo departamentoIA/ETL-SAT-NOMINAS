@@ -17,7 +17,6 @@ ETL-SAT-NOMINAS/
     └── globals.py      # Contains all global variables
     └── config.py       # Contains all configuration params
     └── .env            # Contains all secret data (not provided)
-└── Documentation
 ```
 
 ## ✨ Details
@@ -66,3 +65,25 @@ python main.py ^
   --resume-table table1 ^
   --resume-row 1001
 ```
+
+## 🎯 Results
+After running main (see Fig. 1), the folder 'checkpoints' and the log file 'log.txt' are created, as shown in Fig. 2. Besides, in this case, the file was already converted to utf8 encoding, as shown in Fig. 3, then the table is loaded to SQL Server from the beginning.
+![alt text](Images/r1.png)
+Fig. 1.
+
+![alt text](Images/r2.png)
+Fig. 2.
+
+![alt text](Images/r3.png)
+Fig. 3.
+
+In the folder 'checkpoints' is the corresponding JSON file, which contains the information necessary to restart the table loading, as shown in Fig. 4.
+![alt text](Images/r4.png)
+Fig. 4.
+
+Once the table is completely loaded, the JSON file is removed automatically. The table was renamed to '2025_6F_1S', the design of this table is presented in Fig. 5, which contains 480,998,744 rows, as shown in Fig. 6.
+![alt text](Images/r5.png)
+Fig. 5.
+
+![alt text](Images/r6.png)
+Fig. 6.
